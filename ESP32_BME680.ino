@@ -1,10 +1,12 @@
 /*
+  Original taken from:
+
   Rui Santos
   Complete project details at https://RandomNerdTutorials.com/esp32-mqtt-publish-bme680-arduino/
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files.
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
 */
@@ -20,8 +22,8 @@ extern "C" {
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"
 
-#define WIFI_SSID "REPLACE_WITH_YOUR_SSID"
-#define WIFI_PASSWORD "REPLACE_WITH_YOUR_PASSWORD"
+/* Defines WIFI_SSID and WIFI_PASSWORD */
+#include <wifi_do_not_push.h>
 
 // Raspberry Pi Mosquitto MQTT Broker
 #define MQTT_HOST IPAddress(192, 168, 1, XXX)
@@ -141,7 +143,7 @@ void setup() {
     Serial.println(F("Could not find a valid BME680 sensor, check wiring!"));
     while (1);
   }
-  
+
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
 
@@ -156,7 +158,7 @@ void setup() {
   // If your broker requires authentication (username and password), set them below
   //mqttClient.setCredentials("REPlACE_WITH_YOUR_USER", "REPLACE_WITH_YOUR_PASSWORD");
   connectToWifi();
-  
+
   // Set up oversampling and filter initialization
   bme.setTemperatureOversampling(BME680_OS_8X);
   bme.setHumidityOversampling(BME680_OS_2X);
@@ -167,19 +169,19 @@ void setup() {
 
 void loop() {
   unsigned long currentMillis = millis();
-  // Every X number of seconds (interval = 10 seconds) 
+  // Every X number of seconds (interval = 10 seconds)
   // it publishes a new MQTT message
   if (currentMillis - previousMillis >= interval) {
     // Save the last time a new reading was published
     previousMillis = currentMillis;
-    
+
     getBME680Readings();
     Serial.println();
     Serial.printf("Temperature = %.2f ºC \n", temperature);
     Serial.printf("Humidity = %.2f % \n", humidity);
     Serial.printf("Pressure = %.2f hPa \n", pressure);
     Serial.printf("Gas Resistance = %.2f KOhm \n", gasResistance);
-    
+
     // Publish an MQTT message on topic esp/bme680/temperature
     uint16_t packetIdPub1 = mqttClient.publish(MQTT_PUB_TEMP, 1, true, String(temperature).c_str());
     Serial.printf("Publishing on topic %s at QoS 1, packetId: %i", MQTT_PUB_TEMP, packetIdPub1);
@@ -201,3 +203,5 @@ void loop() {
     Serial.printf("Message: %.2f \n", gasResistance);
   }
 }
+
+/* EOF */
