@@ -26,7 +26,7 @@ extern "C" {
 #include <wifi_do_not_push.h>
 
 // Raspberry Pi Mosquitto MQTT Broker
-#define MQTT_HOST IPAddress(192, 168, 1, XXX)
+#define MQTT_HOST IPAddress(192, 168, 1, 134)
 // For a cloud MQTT broker, type the domain name
 //#define MQTT_HOST "example.com"
 #define MQTT_PORT 1883
